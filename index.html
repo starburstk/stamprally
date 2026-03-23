@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<meta name="apple-mobile-web-app-title" content="輝きスタンプ">
+<link rel="apple-touch-icon" href="IMG_0835.png">
+<link rel="icon" href="IMG_0835.png">
+
+<title>輝きスタンプ</title>
+
+<style>
+
+body{
+font-family:"Hiragino Maru Gothic ProN",sans-serif;
+text-align:center;
+background:#fff7f7;
+margin:0;
+padding:30px 10px;
+user-select: none; 
+-webkit-user-select: none;
+}
+
+h1{
+font-size: 24px; 
+color:#d33;
+margin-top: 20px;
+margin-bottom: 0px; 
+line-height: 1.4; /* 改行しても綺麗に見えるように調整 */
+}
+
+.title-icon {
+font-size: 40px;
+margin-top: 10px; 
+margin-bottom: 10px;
+}
+
+.name-area {
+text-align: left; 
+font-size: 20px; 
+max-width: 500px;
+margin: 0 auto 20px auto; 
+padding: 0 10px;
+color: #ff6b81; 
+font-weight: bold;
+min-height: 30px;
+}
+
+.name-input-wrapper {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.name-input {
+font-size: 18px;
+padding: 8px 12px;
+border: 2px solid #ff6b81;
+border-radius: 8px;
+width: 60%;
+font-family: inherit;
+user-select: auto;
+-webkit-user-select: auto;
+}
+
+.name-btn {
+font-size: 16px;
+padding: 8px 16px;
+background: #ff6b81;
+color: white;
+border: none;
+border-radius: 8px;
+cursor: pointer;
+font-weight: bold;
+height: auto;
+width: auto;
+}
+
+.name-display {
+display: inline-flex;
+align-items: baseline; 
+cursor: pointer; 
+transition: opacity 0.2s;
+border-bottom: 2px dashed #ffb6c1; 
+padding-bottom: 2px;
+}
+
+.name-display:active {
+opacity: 0.6;
+}
+
+.subtitle{
+font-size:20px; 
+margin-bottom: 20px;
+color: #333; 
+}
+
+/* ★追加：上下にピンクの線が入ったスローガン */
+.slogan {
+font-size: 18px;
+color: #333;
+font-weight: bold;
+line-height: 1.6;
+border-top: 2px solid #ffb6c1;
+border-bottom: 2px solid #ffb6c1;
+padding: 15px 0;
+margin: 0 auto 30px auto;
+width: 85%;
+max-width: 320px;
+}
+
+.card{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:15px;
+max-width:500px;
+margin:30px auto;
+}
+
+.slot{
+aspect-ratio: 3 / 4; 
+display: flex;
+flex-direction: column; 
+align-items: center;
+justify-content: center;
+background:white;
+border-radius:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
+transition: transform 0.1s, opacity 0.2s; /* 押したときのアニメーション用 */
+}
+
+/* ★追加：まだスタンプが押されていない「◯」の枠だけタップできるようにする */
+.slot.empty {
+cursor: pointer;
+}
+
+/* ★追加：タップした時に少し凹むような動きをつける */
+.slot.empty:active {
+transform: scale(0.92);
+background: #fff5f5;
+}
+
+.stamp-mark {
+font-size: 40px; 
+}
+
+.stamp-date {
+font-size: 12px;
+color: #666;
+margin-top: 5px;
+min-height: 14px; 
+}
+
+.buttons{
+display: flex;
+flex-direction: column;
+align-items: center;
+margin-top: 30px;
+}
+
+/* ★変更：リセットボタンを小さく、薄いグレーに変更 */
+.resetbtn{
+font-size: 14px; /* 透かしの文字と同じくらいのサイズ */
+padding: 8px 16px;
+background: #e0e0e0; /* 薄いグレー */
+color: #666; /* 文字も濃いグレー */
+border: none;
+border-radius: 8px; /* 丸みも小さく */
+cursor: pointer;
+transition: opacity 0.2s;
+}
+
+.resetbtn:active {
+opacity: 0.7;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>上北沢 輝きグループ<br>出席カード</h1>
+<div class="title-icon">🍓</div>
+
+<div id="name-container" class="name-area"></div>
+
+<div class="subtitle">参加したら、◯ボタンを押してね</div>
+
+<div class="slogan">
+  皆で語り<br>
+  皆で学び<br>
+  皆が創価の幸福博士に
+</div>
+
+<div class="card" id="card"></div>
+
+<div class="buttons">
+  <button class="resetbtn" onclick="resetCard()">リセット</button>
+</div>
+
+<script>
+
+let stamps = JSON.parse(localStorage.getItem("stamps")) || []
+let userName = localStorage.getItem("userName") || ""
+
+function renderName() {
+  const container = document.getElementById("name-container");
+  if (userName) {
+    container.innerHTML = `
+      <div class="name-display" onclick="editName()">
+        <span>${userName} さん</span>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="name-input-wrapper">
+        <input type="text" id="name-input" class="name-input" placeholder="おなまえ">
+        <button class="name-btn" onclick="saveName()">決定</button>
+      </div>
+    `;
+  }
+}
+
+function editName() {
+  const container = document.getElementById("name-container");
+  container.innerHTML = `
+    <div class="name-input-wrapper">
+      <input type="text" id="name-input" class="name-input" placeholder="おなまえ" value="${userName}">
+      <button class="name-btn" onclick="saveName()">決定</button>
+    </div>
+  `;
+}
+
+function saveName() {
+  const input = document.getElementById("name-input");
+  const name = input.value.trim(); 
+  
+  if (name) {
+    userName = name;
+    localStorage.setItem("userName", userName);
+    renderName(); 
+  } else {
+    alert("おなまえを入力してね！");
+  }
+}
+
+function render(){
+  const card=document.getElementById("card")
+  card.innerHTML=""
+
+  for(let i=0;i<8;i++){
+    let slot=document.createElement("div")
+    slot.className="slot"
+
+    let mark=document.createElement("div")
+    mark.className="stamp-mark"
+
+    let dateText=document.createElement("div")
+    dateText.className="stamp-date"
+
+    if(stamps[i]){
+      // スタンプ済みの枠
+      mark.textContent="🍓"
+      dateText.textContent=stamps[i]
+    }else{
+      // まだ押されていない枠（タップ可能にする）
+      mark.textContent="◯"
+      dateText.textContent=""
+      slot.classList.add("empty") // CSSでタップ時の動きをつけるためのクラス
+      slot.onclick = addStamp // タップしたらスタンプを押す機能を追加
+    }
+
+    slot.appendChild(mark)
+    slot.appendChild(dateText)
+    card.appendChild(slot)
+  }
+}
+
+function addStamp(){
+  if(stamps.length>=8){
+    alert("スタンプは8個までです")
+    return
+  }
+
+  let today=new Date()
+  let dateStr=(today.getMonth() + 1) + "/" + today.getDate()
+
+  stamps.push(dateStr)
+  localStorage.setItem("stamps",JSON.stringify(stamps))
+  render()
+}
+
+function resetCard(){
+  if(confirm("スタンプを全部リセットしますか？")){
+    stamps=[]
+    localStorage.removeItem("stamps")
+    render()
+  }
+}
+
+renderName()
+render()
+
+</script>
+
+</body>
+</html>
