@@ -7,95 +7,120 @@
 <title>ココロの週末銭湯 スタンプラリー</title>
 
 <style>
-
 body{
-font-family:"Hiragino Maru Gothic ProN",sans-serif;
-text-align:center;
-background:#f6f1e7;
-margin:0;
-padding:30px 10px;
+  font-family:"Hiragino Maru Gothic ProN",sans-serif;
+  text-align:center;
+  background:#f6f1e7;
+  margin:0;
+  padding:30px 10px 50px;
+  color:#6b5b53;
 }
 
-/* タイトル */
 h1{
-font-size: 26px;
-color:#c96f53;
-line-height: 1.4;
-margin-bottom:10px;
+  font-size: 26px;
+  color:#c96f53;
+  line-height: 1.4;
+  margin-bottom:10px;
 }
 
-/* イラスト */
 .main-visual{
-width:200px;
-margin:10px auto 20px;
-display:block;
+  width:220px;
+  max-width:70%;
+  margin:10px auto 24px;
+  display:block;
+  border:none;
 }
 
-/* サブテキスト */
 .subtitle{
-font-size:18px;
-color:#6b5b53;
-margin-bottom: 25px;
+  font-size:18px;
+  color:#6b5b53;
+  margin-bottom: 28px;
 }
 
-/* カード */
 .card{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:15px;
-max-width:320px;
-margin:20px auto;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+  max-width:320px;
+  margin:20px auto 36px;
 }
 
-/* スタンプ枠 */
 .slot{
-aspect-ratio: 1;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-background:#ffffff;
-border-radius:20px;
-box-shadow:0 4px 10px rgba(0,0,0,0.08);
+  aspect-ratio: 1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:#ffffff;
+  border-radius:24px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.06);
+  transition:transform 0.12s ease, background 0.2s ease;
 }
 
-/* 押せる状態 */
 .slot.empty{
-cursor:pointer;
-background:#fffaf3;
+  cursor:pointer;
+  background:#fffaf3;
 }
 
 .slot.empty:active{
-transform:scale(0.9);
+  transform:scale(0.94);
+  background:#fdf3ea;
 }
 
-/* スタンプ */
 .stamp-mark{
-font-size:32px;
+  font-size:32px;
 }
 
-/* 数字 */
 .stamp-date{
-font-size:14px;
-margin-top:5px;
-color:#a1887f;
+  font-size:14px;
+  margin-top:8px;
+  color:#a1887f;
+  font-weight:600;
 }
 
-/* おみやげ */
-.reward{
-margin-top:30px;
-padding:20px;
-font-size:20px;
-border-radius:16px;
-border:3px solid #d97a5b;
-background:#fff7f2;
-color:#c96f53;
-display:none;
-width:260px;
-margin-left:auto;
-margin-right:auto;
+/* ごほうびエリア */
+.reward-area{
+  min-height:120px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
+.reward-btn,
+.reward-done{
+  width:280px;
+  max-width:85%;
+  min-height:92px;
+  border-radius:28px;
+  font-size:20px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto;
+  box-sizing:border-box;
+}
+
+/* おみやげ交換へボタン */
+.reward-btn{
+  border:3px solid #d97a5b;
+  background:#fff7f2;
+  color:#c96f53;
+  cursor:pointer;
+  transition:transform 0.12s ease, opacity 0.2s ease;
+}
+
+.reward-btn:active{
+  transform:scale(0.97);
+}
+
+/* THANK YOU表示 */
+.reward-done{
+  border:3px solid #b8d8cc;
+  background:#f3fbf8;
+  color:#7aa998;
+  letter-spacing:0.04em;
+}
 </style>
 </head>
 
@@ -106,8 +131,7 @@ margin-right:auto;
 スタンプラリー
 </h1>
 
-<!-- ★ここに画像（同じフォルダに置く） -->
-<img src="onsen.png" class="main-visual">
+<img src="onsen.png" class="main-visual" alt="週末銭湯のイラスト">
 
 <div class="subtitle">
 ブースへ行ったら◯ボタンを押してね
@@ -115,61 +139,97 @@ margin-right:auto;
 
 <div class="card" id="card"></div>
 
-<div id="reward" class="reward">
-おみやげGET！
-</div>
+<div class="reward-area" id="rewardArea"></div>
 
 <script>
+/*
+保存される内容
+- stamps: スタンプ数
+- rewardStatus:
+   "none"     = まだ未達成
+   "ready"    = 3個たまって交換前
+   "done"     = 交換済み（THANK YOU!!）
+*/
 
-let stamps = JSON.parse(localStorage.getItem("stamps")) || []
+let stamps = JSON.parse(localStorage.getItem("stamps")) || [];
+let rewardStatus = localStorage.getItem("rewardStatus") || "none";
+
+function saveData(){
+  localStorage.setItem("stamps", JSON.stringify(stamps));
+  localStorage.setItem("rewardStatus", rewardStatus);
+}
 
 function render(){
-  const card=document.getElementById("card")
-  card.innerHTML=""
+  const card = document.getElementById("card");
+  const rewardArea = document.getElementById("rewardArea");
+  card.innerHTML = "";
+  rewardArea.innerHTML = "";
 
-  for(let i=0;i<3;i++){
-    let slot=document.createElement("div")
-    slot.className="slot"
+  // スタンプ3つ表示
+  for(let i=0; i<3; i++){
+    let slot = document.createElement("div");
+    slot.className = "slot";
 
-    let mark=document.createElement("div")
-    mark.className="stamp-mark"
+    let mark = document.createElement("div");
+    mark.className = "stamp-mark";
 
-    let number=document.createElement("div")
-    number.className="stamp-date"
+    let number = document.createElement("div");
+    number.className = "stamp-date";
 
     if(stamps[i]){
-      mark.textContent="♨️"
-      number.textContent = i + 1
+      mark.textContent = "♨️";
+      number.textContent = i + 1;
     }else{
-      mark.textContent="◯"
-      number.textContent=""
-      slot.classList.add("empty")
-      slot.onclick = addStamp
+      mark.textContent = "◯";
+      number.textContent = "";
+      slot.classList.add("empty");
+      slot.onclick = addStamp;
     }
 
-    slot.appendChild(mark)
-    slot.appendChild(number)
-    card.appendChild(slot)
+    slot.appendChild(mark);
+    slot.appendChild(number);
+    card.appendChild(slot);
   }
 
-  // ★3つたまったら表示
-  if(stamps.length >= 3){
-    document.getElementById("reward").style.display = "block"
+  // 3つたまったら rewardStatus を ready に
+  if(stamps.length >= 3 && rewardStatus === "none"){
+    rewardStatus = "ready";
+    saveData();
+  }
+
+  // ごほうび表示
+  if(rewardStatus === "ready"){
+    rewardArea.innerHTML = `
+      <button class="reward-btn" onclick="exchangeGift()">
+        おみやげ交換へ☺︎
+      </button>
+    `;
+  } else if(rewardStatus === "done"){
+    rewardArea.innerHTML = `
+      <div class="reward-done">
+        THANK YOU!!
+      </div>
+    `;
   }
 }
 
 function addStamp(){
-  if(stamps.length>=3){
-    return
+  if(stamps.length >= 3){
+    return;
   }
 
-  stamps.push(true)
-  localStorage.setItem("stamps",JSON.stringify(stamps))
-  render()
+  stamps.push(true);
+  saveData();
+  render();
 }
 
-render()
+function exchangeGift(){
+  rewardStatus = "done";
+  saveData();
+  render();
+}
 
+render();
 </script>
 
 </body>
