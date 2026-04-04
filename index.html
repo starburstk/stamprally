@@ -2,187 +2,98 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="apple-mobile-web-app-title" content="スターバースト唱題会">
-<link rel="apple-touch-icon" href="icon.png">
-<link rel="icon" href="icon.png">
-
-<title>スターバースト唱題会 出席カード</title>
+<title>ココロの週末銭湯 スタンプラリー</title>
 
 <style>
 
 body{
 font-family:"Hiragino Maru Gothic ProN",sans-serif;
 text-align:center;
-/* 背景：薄いオレンジ/黄色系に変更 */
-background:#fffcf2;
+background:#f6f1e7;
 margin:0;
 padding:30px 10px;
-user-select: none; 
--webkit-user-select: none;
 }
 
+/* タイトル */
 h1{
-font-size: 24px; 
-/* 文字色：濃いオレンジに変更 */
-color:#e65100;
-margin-top: 20px;
-margin-bottom: 0px; 
+font-size: 26px;
+color:#c96f53;
 line-height: 1.4;
+margin-bottom:10px;
 }
 
-.title-icon {
-font-size: 40px;
-margin-top: 10px; 
-margin-bottom: 10px;
+/* イラスト */
+.main-visual{
+width:200px;
+margin:10px auto 20px;
+display:block;
 }
 
-.name-area {
-text-align: left; 
-font-size: 20px; 
-max-width: 500px;
-margin: 0 auto 20px auto; 
-padding: 0 10px;
-/* 名前エリア色：鮮やかなオレンジ系 */
-color: #ff9800; 
-font-weight: bold;
-min-height: 30px;
-}
-
-.name-input-wrapper {
-display: flex;
-align-items: center;
-gap: 10px;
-}
-
-.name-input {
-font-size: 18px;
-padding: 8px 12px;
-/* 枠線色：オレンジ系 */
-border: 2px solid #ffa726;
-border-radius: 8px;
-width: 60%;
-font-family: inherit;
-user-select: auto;
--webkit-user-select: auto;
-}
-
-.name-btn {
-font-size: 16px;
-padding: 8px 16px;
-/* ボタン色：オレンジ系 */
-background: #ff9800;
-color: white;
-border: none;
-border-radius: 8px;
-cursor: pointer;
-font-weight: bold;
-height: auto;
-width: auto;
-}
-
-.name-display {
-display: inline-flex;
-align-items: baseline; 
-cursor: pointer; 
-transition: opacity 0.2s;
-/* 下線色：薄いオレンジ/黄色系 */
-border-bottom: 2px dashed #ffe082; 
-padding-bottom: 2px;
-}
-
-.name-display:active {
-opacity: 0.6;
-}
-
+/* サブテキスト */
 .subtitle{
-font-size:20px; 
-margin-bottom: 20px;
-color: #333; 
+font-size:18px;
+color:#6b5b53;
+margin-bottom: 25px;
 }
 
-/* ★追加：上下にピンクの線が入ったスローガン */
-.slogan {
-font-size: 18px;
-color: #333;
-font-weight: bold;
-line-height: 1.6;
-/* 枠線色：薄い黄色に変更 */
-border-top: 2px solid #ffecb3;
-border-bottom: 2px solid #ffecb3;
-padding: 15px 0;
-margin: 0 auto 30px auto;
-width: 85%;
-max-width: 320px;
-}
-
+/* カード */
 .card{
 display:grid;
-grid-template-columns:repeat(4,1fr);
+grid-template-columns:repeat(3,1fr);
 gap:15px;
-max-width:500px;
-margin:30px auto;
+max-width:320px;
+margin:20px auto;
 }
 
+/* スタンプ枠 */
 .slot{
-aspect-ratio: 3 / 4; 
-display: flex;
-flex-direction: column; 
-align-items: center;
-justify-content: center;
-background:white;
-border-radius:10px;
-box-shadow:0 4px 10px rgba(0,0,0,0.1);
-transition: transform 0.1s, opacity 0.2s;
+aspect-ratio: 1;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+background:#ffffff;
+border-radius:20px;
+box-shadow:0 4px 10px rgba(0,0,0,0.08);
 }
 
-/* ★追加：まだスタンプが押されていない「◯」の枠だけタップできるようにする */
-.slot.empty {
-cursor: pointer;
+/* 押せる状態 */
+.slot.empty{
+cursor:pointer;
+background:#fffaf3;
 }
 
-/* ★追加：タップした時に少し凹むような動きをつける */
-.slot.empty:active {
-transform: scale(0.92);
-/* タップ時背景：薄い黄色に変更 */
-background: #fffde7;
+.slot.empty:active{
+transform:scale(0.9);
 }
 
-.stamp-mark {
-font-size: 40px; 
+/* スタンプ */
+.stamp-mark{
+font-size:32px;
 }
 
-.stamp-date {
-font-size: 12px;
-color: #666;
-margin-top: 5px;
-min-height: 14px; 
+/* 数字 */
+.stamp-date{
+font-size:14px;
+margin-top:5px;
+color:#a1887f;
 }
 
-.buttons{
-display: flex;
-flex-direction: column;
-align-items: center;
-margin-top: 30px;
-}
-
-/* ★変更：リセットボタンを小さく、薄いグレーに変更 */
-.resetbtn{
-font-size: 14px; 
-padding: 8px 16px;
-background: #e0e0e0; 
-color: #666; 
-border: none;
-border-radius: 8px; 
-cursor: pointer;
-transition: opacity 0.2s;
-}
-
-.resetbtn:active {
-opacity: 7;
+/* おみやげ */
+.reward{
+margin-top:30px;
+padding:20px;
+font-size:20px;
+border-radius:16px;
+border:3px solid #d97a5b;
+background:#fff7f2;
+color:#c96f53;
+display:none;
+width:260px;
+margin-left:auto;
+margin-right:auto;
 }
 
 </style>
@@ -190,126 +101,73 @@ opacity: 7;
 
 <body>
 
-<h1>スターバースト唱題会<br>出席カード</h1>
-<div class="title-icon">💫</div>
+<h1>
+ココロの週末銭湯<br>
+スタンプラリー
+</h1>
 
-<div id="name-container" class="name-area"></div>
+<!-- ★ここに画像（同じフォルダに置く） -->
+<img src="onsen.png" class="main-visual">
 
-<div class="subtitle">参加したら、◯ボタンを押してね</div>
-
-<div class="slogan">
-  皆で語り<br>
-  皆で学び<br>
-  皆が創価の幸福博士に
+<div class="subtitle">
+ブースへ行ったら◯ボタンを押してね
 </div>
 
 <div class="card" id="card"></div>
 
-<div class="buttons">
-  <button class="resetbtn" onclick="resetCard()">リセット</button>
+<div id="reward" class="reward">
+おみやげGET！
 </div>
 
 <script>
 
 let stamps = JSON.parse(localStorage.getItem("stamps")) || []
-let userName = localStorage.getItem("userName") || ""
-
-function renderName() {
-  const container = document.getElementById("name-container");
-  if (userName) {
-    container.innerHTML = `
-      <div class="name-display" onclick="editName()">
-        <span>${userName} さん</span>
-      </div>
-    `;
-  } else {
-    container.innerHTML = `
-      <div class="name-input-wrapper">
-        <input type="text" id="name-input" class="name-input" placeholder="おなまえ">
-        <button class="name-btn" onclick="saveName()">決定</button>
-      </div>
-    `;
-  }
-}
-
-function editName() {
-  const container = document.getElementById("name-container");
-  container.innerHTML = `
-    <div class="name-input-wrapper">
-      <input type="text" id="name-input" class="name-input" placeholder="おなまえ" value="${userName}">
-      <button class="name-btn" onclick="saveName()">決定</button>
-    </div>
-  `;
-}
-
-function saveName() {
-  const input = document.getElementById("name-input");
-  const name = input.value.trim(); 
-  
-  if (name) {
-    userName = name;
-    localStorage.setItem("userName", userName);
-    renderName(); 
-  } else {
-    alert("おなまえを入力してね！");
-  }
-}
 
 function render(){
   const card=document.getElementById("card")
   card.innerHTML=""
 
-  for(let i=0;i<8;i++){
+  for(let i=0;i<3;i++){
     let slot=document.createElement("div")
     slot.className="slot"
 
     let mark=document.createElement("div")
     mark.className="stamp-mark"
 
-    let dateText=document.createElement("div")
-    dateText.className="stamp-date"
+    let number=document.createElement("div")
+    number.className="stamp-date"
 
     if(stamps[i]){
-      // スタンプ済みの枠: スタンプを💫に変更
-      mark.textContent="💫"
-      dateText.textContent=stamps[i]
+      mark.textContent="♨️"
+      number.textContent = i + 1
     }else{
-      // まだ押されていない枠（タップ可能にする）
       mark.textContent="◯"
-      dateText.textContent=""
-      slot.classList.add("empty") 
-      slot.onclick = addStamp 
+      number.textContent=""
+      slot.classList.add("empty")
+      slot.onclick = addStamp
     }
 
     slot.appendChild(mark)
-    slot.appendChild(dateText)
+    slot.appendChild(number)
     card.appendChild(slot)
+  }
+
+  // ★3つたまったら表示
+  if(stamps.length >= 3){
+    document.getElementById("reward").style.display = "block"
   }
 }
 
 function addStamp(){
-  if(stamps.length>=8){
-    alert("スタンプは8個までです")
+  if(stamps.length>=3){
     return
   }
 
-  let today=new Date()
-  let dateStr=(today.getMonth() + 1) + "/" + today.getDate()
-
-  stamps.push(dateStr)
+  stamps.push(true)
   localStorage.setItem("stamps",JSON.stringify(stamps))
   render()
 }
 
-function resetCard(){
-  if(confirm("スタンプを全部リセットしますか？")){
-    stamps=[]
-    localStorage.removeItem("stamps")
-    render()
-  }
-}
-
-renderName()
 render()
 
 </script>
