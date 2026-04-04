@@ -2,91 +2,145 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <title>ココロの週末銭湯 スタンプラリー</title>
 
 <style>
-body{
-  font-family:"Hiragino Maru Gothic ProN",sans-serif;
-  text-align:center;
-  background:#f6f1e7;
+:root{
+  --bg: #f3ede2;
+  --main: #cd7658;
+  --main-dark: #b96549;
+  --text: #6f5f57;
+  --sub: #8f7e75;
+  --mint: #b9d8cb;
+  --card: #fffaf4;
+  --line: rgba(0,0,0,0.05);
+  --shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body{
   margin:0;
-  padding:30px 12px 50px;
-  color:#6b5b53;
+  padding:0;
+  background:var(--bg);
+  font-family:"Hiragino Maru Gothic ProN","Yu Gothic","Meiryo",sans-serif;
+  color:var(--text);
 }
 
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:18px 12px 24px;
+}
+
+.wrapper{
+  width:100%;
+  max-width:390px;
+  text-align:center;
+}
+
+/* タイトル */
 h1{
-  font-size: 26px;
-  color:#c96f53;
-  line-height: 1.4;
-  margin-bottom:10px;
-  cursor:pointer;
+  margin:0 0 10px;
+  font-size:clamp(22px, 6vw, 28px);
+  line-height:1.35;
+  color:var(--main);
+  font-weight:700;
+  letter-spacing:0.02em;
   user-select:none;
+  cursor:pointer;
 }
 
+/* イラスト */
 .main-visual{
-  width:220px;
-  max-width:70%;
-  margin:10px auto 24px;
+  width:min(170px, 48vw);
   display:block;
-  border:none;
+  margin:0 auto 12px;
 }
 
+/* 説明 */
 .subtitle{
-  font-size:17px;
-  color:#6b5b53;
-  margin-bottom: 28px;
-  line-height:1.8;
+  font-size:15px;
+  line-height:1.7;
+  color:var(--text);
+  margin:0 auto 16px;
 }
 
+/* スタンプ一覧 */
 .card{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:15px;
-  max-width:360px;
-  margin:20px auto 36px;
+  grid-template-columns:repeat(2, 1fr);
+  gap:10px;
+  max-width:340px;
+  margin:0 auto 14px;
 }
 
 .slot{
-  aspect-ratio: 1;
+  background:var(--card);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  padding:10px 8px 8px;
+  min-height:106px;
   display:flex;
   flex-direction:column;
-  align-items:center;
   justify-content:center;
-  background:#ffffff;
-  border-radius:24px;
-  box-shadow:0 6px 16px rgba(0,0,0,0.06);
+  align-items:center;
   transition:transform 0.12s ease, background 0.2s ease;
-  padding:10px;
-  box-sizing:border-box;
   cursor:pointer;
+  border:1px solid transparent;
 }
 
 .slot:active{
-  transform:scale(0.95);
-  background:#fdf7f1;
+  transform:scale(0.97);
+  background:#fff8f1;
+}
+
+.slot.stamped{
+  border:1px solid #f0e3d8;
 }
 
 .stamp-mark{
-  font-size:32px;
-  margin-bottom:10px;
+  font-size:28px;
+  line-height:1;
+  margin-bottom:8px;
 }
 
 .stamp-label{
-  font-size:14px;
-  color:#8c776d;
+  font-size:13px;
+  line-height:1.35;
+  color:var(--sub);
   font-weight:600;
-  line-height:1.5;
-  min-height:42px;
+  text-align:center;
+  min-height:34px;
   display:flex;
   align-items:center;
   justify-content:center;
-  text-align:center;
 }
 
+/* 最後の1マスを中央寄せ */
+.slot.last-single{
+  grid-column:1 / -1;
+  width:48%;
+  justify-self:center;
+}
+
+/* 達成状況 */
+.progress{
+  font-size:13px;
+  color:#9b8a81;
+  margin:0 0 10px;
+  font-weight:600;
+}
+
+/* ごほうびエリア */
 .reward-area{
-  min-height:120px;
+  min-height:84px;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -94,11 +148,10 @@ h1{
 
 .reward-btn,
 .reward-done{
-  width:290px;
-  max-width:88%;
-  min-height:92px;
-  border-radius:28px;
-  font-size:20px;
+  width:min(280px, 88%);
+  min-height:72px;
+  border-radius:24px;
+  font-size:18px;
   font-weight:700;
   display:flex;
   align-items:center;
@@ -108,60 +161,103 @@ h1{
 }
 
 .reward-btn{
-  border:3px solid #d97a5b;
-  background:#fff7f2;
-  color:#c96f53;
+  border:3px solid var(--main);
+  background:#fff6f0;
+  color:var(--main);
   cursor:pointer;
   transition:transform 0.12s ease, opacity 0.2s ease;
 }
 
 .reward-btn:active{
-  transform:scale(0.97);
+  transform:scale(0.98);
 }
 
 .reward-done{
-  border:3px solid #b8d8cc;
+  border:3px solid var(--mint);
   background:#f3fbf8;
-  color:#7aa998;
+  color:#78a796;
   letter-spacing:0.04em;
 }
 
-.helper{
-  font-size:12px;
-  color:#b09b91;
-  margin-top:8px;
+/* 小さいスマホ向け */
+@media (max-width: 360px){
+  body{
+    padding:14px 10px 20px;
+  }
+
+  .main-visual{
+    width:min(150px, 46vw);
+    margin-bottom:10px;
+  }
+
+  .subtitle{
+    font-size:14px;
+    margin-bottom:14px;
+  }
+
+  .card{
+    gap:9px;
+    max-width:320px;
+  }
+
+  .slot{
+    min-height:98px;
+    border-radius:18px;
+    padding:8px 6px;
+  }
+
+  .stamp-mark{
+    font-size:26px;
+    margin-bottom:6px;
+  }
+
+  .stamp-label{
+    font-size:12px;
+    min-height:30px;
+  }
+
+  .reward-btn,
+  .reward-done{
+    min-height:66px;
+    font-size:17px;
+    border-radius:22px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<h1 id="mainTitle">
-ココロの週末銭湯<br>
-スタンプラリー
-</h1>
+<div class="wrapper">
 
-<img src="onsen.png" class="main-visual" alt="週末銭湯のイラスト">
+  <h1 id="mainTitle">
+    ココロの週末銭湯<br>
+    スタンプラリー
+  </h1>
 
-<div class="subtitle">
-この画面をブーススタッフにご提示ください。<br>
-スタンプ3つで、おみやげプレゼント♩
+  <img src="onsen.png" class="main-visual" alt="週末銭湯のイラスト">
+
+  <div class="subtitle">
+    この画面をブーススタッフにご提示ください。<br>
+    スタンプ3つで、おみやげプレゼント♩
+  </div>
+
+  <div class="progress" id="progressText"></div>
+
+  <div class="card" id="card"></div>
+
+  <div class="reward-area" id="rewardArea"></div>
+
 </div>
-
-<div class="card" id="card"></div>
-
-<div class="reward-area" id="rewardArea"></div>
-
-<div class="helper"></div>
 
 <script>
 /*
 保存内容
-- stamps: 各ブースの押印状態（true/false）
+- stamps: 各ブースの押印状態（true / false）
 - rewardStatus:
-   "none"  = 未達成
-   "ready" = 3つ達成・交換前
-   "done"  = 交換済み
+    "none"  = 未達成
+    "ready" = 3つ達成・交換前
+    "done"  = 交換済み
 */
 
 const boothNames = [
@@ -174,6 +270,7 @@ const boothNames = [
 
 let stamps = JSON.parse(localStorage.getItem("stamps")) || [false, false, false, false, false];
 let rewardStatus = localStorage.getItem("rewardStatus") || "none";
+
 let titleTapCount = 0;
 let titleTapTimer = null;
 
@@ -189,19 +286,27 @@ function getStampCount(){
 function render(){
   const card = document.getElementById("card");
   const rewardArea = document.getElementById("rewardArea");
+  const progressText = document.getElementById("progressText");
+
   card.innerHTML = "";
   rewardArea.innerHTML = "";
 
+  const count = getStampCount();
+  progressText.textContent = `スタンプ ${count} / 3`;
+
   boothNames.forEach((name, i) => {
-    let slot = document.createElement("div");
+    const slot = document.createElement("div");
     slot.className = "slot";
+    if(stamps[i]) slot.classList.add("stamped");
+    if(i === boothNames.length - 1) slot.classList.add("last-single");
+
     slot.onclick = () => toggleStamp(i);
 
-    let mark = document.createElement("div");
+    const mark = document.createElement("div");
     mark.className = "stamp-mark";
     mark.textContent = stamps[i] ? "♨️" : "◯";
 
-    let label = document.createElement("div");
+    const label = document.createElement("div");
     label.className = "stamp-label";
     label.textContent = name;
 
@@ -209,8 +314,6 @@ function render(){
     slot.appendChild(label);
     card.appendChild(slot);
   });
-
-  const count = getStampCount();
 
   if(count >= 3 && rewardStatus === "none"){
     rewardStatus = "ready";
@@ -233,9 +336,6 @@ function render(){
 }
 
 function toggleStamp(index){
-  // 交換済み後は変更不可にしたい場合はここを有効化
-  // if(rewardStatus === "done") return;
-
   stamps[index] = !stamps[index];
 
   const count = getStampCount();
@@ -258,14 +358,14 @@ function exchangeGift(){
   render();
 }
 
-// タイトル5回タップでリセット
+/* タイトル5回タップでリセット */
 document.getElementById("mainTitle").addEventListener("click", function(){
   titleTapCount++;
 
   clearTimeout(titleTapTimer);
   titleTapTimer = setTimeout(() => {
     titleTapCount = 0;
-  }, 2000); // 2秒以内に連続タップ
+  }, 2000);
 
   if(titleTapCount >= 5){
     if(confirm("スタンプをリセットしますか？")){
