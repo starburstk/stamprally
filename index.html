@@ -12,7 +12,7 @@ body{
   text-align:center;
   background:#f6f1e7;
   margin:0;
-  padding:30px 10px 50px;
+  padding:30px 12px 50px;
   color:#6b5b53;
 }
 
@@ -21,6 +21,8 @@ h1{
   color:#c96f53;
   line-height: 1.4;
   margin-bottom:10px;
+  cursor:pointer;
+  user-select:none;
 }
 
 .main-visual{
@@ -32,16 +34,17 @@ h1{
 }
 
 .subtitle{
-  font-size:18px;
+  font-size:17px;
   color:#6b5b53;
   margin-bottom: 28px;
+  line-height:1.8;
 }
 
 .card{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(2,1fr);
   gap:15px;
-  max-width:320px;
+  max-width:360px;
   margin:20px auto 36px;
 }
 
@@ -55,30 +58,33 @@ h1{
   border-radius:24px;
   box-shadow:0 6px 16px rgba(0,0,0,0.06);
   transition:transform 0.12s ease, background 0.2s ease;
-}
-
-.slot.empty{
+  padding:10px;
+  box-sizing:border-box;
   cursor:pointer;
-  background:#fffaf3;
 }
 
-.slot.empty:active{
-  transform:scale(0.94);
-  background:#fdf3ea;
+.slot:active{
+  transform:scale(0.95);
+  background:#fdf7f1;
 }
 
 .stamp-mark{
   font-size:32px;
+  margin-bottom:10px;
 }
 
-.stamp-date{
+.stamp-label{
   font-size:14px;
-  margin-top:8px;
-  color:#a1887f;
+  color:#8c776d;
   font-weight:600;
+  line-height:1.5;
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
 
-/* ごほうびエリア */
 .reward-area{
   min-height:120px;
   display:flex;
@@ -88,8 +94,8 @@ h1{
 
 .reward-btn,
 .reward-done{
-  width:280px;
-  max-width:85%;
+  width:290px;
+  max-width:88%;
   min-height:92px;
   border-radius:28px;
   font-size:20px;
@@ -101,7 +107,6 @@ h1{
   box-sizing:border-box;
 }
 
-/* おみやげ交換へボタン */
 .reward-btn{
   border:3px solid #d97a5b;
   background:#fff7f2;
@@ -114,19 +119,24 @@ h1{
   transform:scale(0.97);
 }
 
-/* THANK YOU表示 */
 .reward-done{
   border:3px solid #b8d8cc;
   background:#f3fbf8;
   color:#7aa998;
   letter-spacing:0.04em;
 }
+
+.helper{
+  font-size:12px;
+  color:#b09b91;
+  margin-top:8px;
+}
 </style>
 </head>
 
 <body>
 
-<h1>
+<h1 id="mainTitle">
 ココロの週末銭湯<br>
 スタンプラリー
 </h1>
@@ -134,29 +144,46 @@ h1{
 <img src="onsen.png" class="main-visual" alt="週末銭湯のイラスト">
 
 <div class="subtitle">
-ブースへ行ったら◯ボタンを押してね
+この画面をブーススタッフにご提示ください。<br>
+スタンプ3つで、おみやげプレゼント♩
 </div>
 
 <div class="card" id="card"></div>
 
 <div class="reward-area" id="rewardArea"></div>
 
+<div class="helper"></div>
+
 <script>
 /*
-保存される内容
-- stamps: スタンプ数
+保存内容
+- stamps: 各ブースの押印状態（true/false）
 - rewardStatus:
-   "none"     = まだ未達成
-   "ready"    = 3個たまって交換前
-   "done"     = 交換済み（THANK YOU!!）
+   "none"  = 未達成
+   "ready" = 3つ達成・交換前
+   "done"  = 交換済み
 */
 
-let stamps = JSON.parse(localStorage.getItem("stamps")) || [];
+const boothNames = [
+  "読書処",
+  "娯楽室",
+  "足湯雑談",
+  "みんなの入浴剤",
+  "お茶コーナー"
+];
+
+let stamps = JSON.parse(localStorage.getItem("stamps")) || [false, false, false, false, false];
 let rewardStatus = localStorage.getItem("rewardStatus") || "none";
+let titleTapCount = 0;
+let titleTapTimer = null;
 
 function saveData(){
   localStorage.setItem("stamps", JSON.stringify(stamps));
   localStorage.setItem("rewardStatus", rewardStatus);
+}
+
+function getStampCount(){
+  return stamps.filter(Boolean).length;
 }
 
 function render(){
@@ -165,39 +192,31 @@ function render(){
   card.innerHTML = "";
   rewardArea.innerHTML = "";
 
-  // スタンプ3つ表示
-  for(let i=0; i<3; i++){
+  boothNames.forEach((name, i) => {
     let slot = document.createElement("div");
     slot.className = "slot";
+    slot.onclick = () => toggleStamp(i);
 
     let mark = document.createElement("div");
     mark.className = "stamp-mark";
+    mark.textContent = stamps[i] ? "♨️" : "◯";
 
-    let number = document.createElement("div");
-    number.className = "stamp-date";
-
-    if(stamps[i]){
-      mark.textContent = "♨️";
-      number.textContent = i + 1;
-    }else{
-      mark.textContent = "◯";
-      number.textContent = "";
-      slot.classList.add("empty");
-      slot.onclick = addStamp;
-    }
+    let label = document.createElement("div");
+    label.className = "stamp-label";
+    label.textContent = name;
 
     slot.appendChild(mark);
-    slot.appendChild(number);
+    slot.appendChild(label);
     card.appendChild(slot);
-  }
+  });
 
-  // 3つたまったら rewardStatus を ready に
-  if(stamps.length >= 3 && rewardStatus === "none"){
+  const count = getStampCount();
+
+  if(count >= 3 && rewardStatus === "none"){
     rewardStatus = "ready";
     saveData();
   }
 
-  // ごほうび表示
   if(rewardStatus === "ready"){
     rewardArea.innerHTML = `
       <button class="reward-btn" onclick="exchangeGift()">
@@ -213,12 +232,22 @@ function render(){
   }
 }
 
-function addStamp(){
-  if(stamps.length >= 3){
-    return;
+function toggleStamp(index){
+  // 交換済み後は変更不可にしたい場合はここを有効化
+  // if(rewardStatus === "done") return;
+
+  stamps[index] = !stamps[index];
+
+  const count = getStampCount();
+
+  if(rewardStatus === "done" && count < 3){
+    rewardStatus = "none";
+  } else if(rewardStatus === "ready" && count < 3){
+    rewardStatus = "none";
+  } else if(rewardStatus === "none" && count >= 3){
+    rewardStatus = "ready";
   }
 
-  stamps.push(true);
   saveData();
   render();
 }
@@ -228,6 +257,26 @@ function exchangeGift(){
   saveData();
   render();
 }
+
+// タイトル5回タップでリセット
+document.getElementById("mainTitle").addEventListener("click", function(){
+  titleTapCount++;
+
+  clearTimeout(titleTapTimer);
+  titleTapTimer = setTimeout(() => {
+    titleTapCount = 0;
+  }, 2000); // 2秒以内に連続タップ
+
+  if(titleTapCount >= 5){
+    if(confirm("スタンプをリセットしますか？")){
+      stamps = [false, false, false, false, false];
+      rewardStatus = "none";
+      saveData();
+      render();
+    }
+    titleTapCount = 0;
+  }
+});
 
 render();
 </script>
